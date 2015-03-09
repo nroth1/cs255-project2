@@ -128,9 +128,9 @@ var client = function(client_sec_key_base64,
   client.connect = function(host, port) {
     // TODO: fill in client options
     var client_options = {
-      ca: null,
-      host: null,
-      port: null,
+      ca: fs.readFileSync('data/cs255ca.pem'),
+      host: 'ec2-54-67-122-91.us-west-1.compute.amazonaws.com',
+      port: 8817,
       rejectUnauthorized: true
     };
 

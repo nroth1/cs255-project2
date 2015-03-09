@@ -3,8 +3,8 @@ var lib = require('./lib');
 
 var fs = require('fs');
 
-var client_pw = 'password for your client key';
-var suid = 'your sunet username'
+var client_pw = 'a45basdp03m04n6cdxza120x';
+var suid = 'nroth'
 
 var ca_crt = fs.readFileSync('data/cs255ca.pem');
 var client_sec_key = fs.readFileSync('data/key.sec').toString('utf8');

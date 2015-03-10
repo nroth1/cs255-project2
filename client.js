@@ -36,8 +36,33 @@ var client = function(client_sec_key_base64,
   }
 
   function check_cert(crt) {
-    // TODO: check that server's certificate is valid
-    return true;
+	console.log(crt)
+	if(!crt.hasOwnProperty('issuer') || !crt.hasOwnProperty('subject') || !crt.hasOwnProperty('fingerprint') 
+			|| !crt.hasOwnProperty('valid_from') || !crt.hasOwnProperty('valid_to')){
+		console.log('Fields Missing')
+		protocol_abort(client)
+	}
+	
+ 
+	var MILLISECONDS_PER_DAY = 1000 * 60*60*24
+	var now = new Date()
+	var valid_to_d = new Date(crt.valid_to)
+	var valid_from_d =  new Date(crt.valid_from)
+	//how many days in the future certificate will expire
+	var future_exp = (valid_to_d.valueOf()-now.valueOf())/(MILLISECONDS_PER_DAY)
+	console.log(future_exp)
+	if(now <  valid_from_d || now > valid_to_d || future_exp <= 120){
+		console.log('Invalid Time')
+		protocol_abort(client)
+	}	
+	var subject = crt.subject	
+	if(!(subject.c == 'US') || !(subject.st =='CA') || !(subject.L == 'Stanford') || !(subject.O == 'CS 255') || !(subject.OU == 'Project 2') 
+	|| !(subject.CN == 'ec2-54-67-122-91.us-west-1.compute.amazonaws.com') || !(subject.emailAddress == 'cs255ta@cs.stanford.edu')){
+		console.log('Subject wrong')
+		protocol_abort(client)
+	}		 
+ 	// TODO: check that server's certificate is valid
+	return true;
   }
 
   function compute_response(challenge) {
@@ -128,6 +153,7 @@ var client = function(client_sec_key_base64,
   client.connect = function(host, port) {
     // TODO: fill in client options
     var client_options = {
+      //need to modify certificate somehow. . . by pinning it.
       ca: fs.readFileSync('data/cs255ca.pem'),
       host: 'ec2-54-67-122-91.us-west-1.compute.amazonaws.com',
       port: 8817,

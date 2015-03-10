@@ -37,42 +37,39 @@ var client = function(client_sec_key_base64,
 
   function check_cert(crt) {
 	console.log(crt)
-	if(!crt.hasOwnProperty('issuer') || !crt.hasOwnProperty('subject') || !crt.hasOwnProperty('fingerprint') 
+	if (!crt.hasOwnProperty('issuer') || !crt.hasOwnProperty('subject') || !crt.hasOwnProperty('fingerprint') 
 			|| !crt.hasOwnProperty('valid_from') || !crt.hasOwnProperty('valid_to')){
 		console.log('Fields Missing')
 		return false
-		//protocol_abort(client)
 	}
 	
- 
-	var MILLISECONDS_PER_DAY = 1000 * 60*60*24
+	var MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24
 	var now = new Date()
 	var valid_to_d = new Date(crt.valid_to)
 	var valid_from_d =  new Date(crt.valid_from)
-	//how many days in the future certificate will expire
-	var future_exp = (valid_to_d.valueOf()-now.valueOf())/(MILLISECONDS_PER_DAY)
+
+	// how many days in the future certificate will expire (this should be within 120 days)
+	var future_exp = (valid_to_d.valueOf() - now.valueOf())/(MILLISECONDS_PER_DAY)
 	console.log(future_exp)
-	if(now <  valid_from_d || now > valid_to_d || future_exp <= 120){
+	if (now < valid_from_d || now > valid_to_d || future_exp <= 120) {
 		console.log('Invalid Time')
 		return false
-		protocol_abort(client)
 	}	
+
+    // check all the subject fields
 	var subject = crt.subject	
-	if(!(subject.C == 'US') || !(subject.ST =='CA') || !(subject.L == 'Stanford') || !(subject.O == 'CS 255') || !(subject.OU == 'Project 2') 
-	|| !(subject.CN == 'ec2-54-67-122-91.us-west-1.compute.amazonaws.com') || !(subject.emailAddress == 'cs255ta@cs.stanford.edu')){
-	//if(!(subject.C == 'US')){
-		console.log('Subject wrong')
+	if (!(subject.C == 'US') || !(subject.ST =='CA') || !(subject.L == 'Stanford') || !(subject.O == 'CS 255') || !(subject.OU == 'Project 2') 
+	       || !(subject.CN == 'ec2-54-67-122-91.us-west-1.compute.amazonaws.com') || !(subject.emailAddress == 'cs255ta@cs.stanford.edu')) {
+		console.log('Subject Not Matched')
 		return false
-		//protocol_abort(client)
 	}		 
 	return true;
   }
 
   function compute_response(challenge) {
 	console.log('CHALLENGING')
-	// TODO: compute the response to the challenge and return it. 
-	return lib.bitarray_to_hex(lib.ECDSA_sign(client_sec_key ,lib.hex_to_bitarray(challenge) ));
-	//return lib.bitarray_to_hex(lib.random_bitarray(256));
+	// compute the response to the challenge and return it. 
+	return lib.bitarray_to_hex(lib.ECDSA_sign(client_sec_key, lib.hex_to_bitarray(challenge)));
   }
 
   // Note: You will not need to modify this function
@@ -156,7 +153,7 @@ var client = function(client_sec_key_base64,
   var client = {};
 
   client.connect = function(host, port) {
-    // TODO: fill in client options
+    // fill in client options
     var client_options = {
       ca: ca_cert,
       host: host,

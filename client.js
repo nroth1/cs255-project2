@@ -71,8 +71,8 @@ var client = function(client_sec_key_base64,
   function compute_response(challenge) {
 	console.log('CHALLENGING')
 	// TODO: compute the response to the challenge and return it. 
-	//return lib.bitarray_to_hex(lib.ECDSA_sign(client_sec_key ,lib.hex_to_bitarray(challenge) ));
-	return lib.bitarray_to_hex(lib.random_bitarray(256));
+	return lib.bitarray_to_hex(lib.ECDSA_sign(client_sec_key ,lib.hex_to_bitarray(challenge) ));
+	//return lib.bitarray_to_hex(lib.random_bitarray(256));
   }
 
   // Note: You will not need to modify this function
@@ -158,7 +158,6 @@ var client = function(client_sec_key_base64,
   client.connect = function(host, port) {
     // TODO: fill in client options
     var client_options = {
-      //need to modify certificate somehow. . . by pinning it.
       ca: ca_cert,
       host: host,
       port: port,

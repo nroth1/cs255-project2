@@ -40,7 +40,8 @@ var client = function(client_sec_key_base64,
 	if(!crt.hasOwnProperty('issuer') || !crt.hasOwnProperty('subject') || !crt.hasOwnProperty('fingerprint') 
 			|| !crt.hasOwnProperty('valid_from') || !crt.hasOwnProperty('valid_to')){
 		console.log('Fields Missing')
-		protocol_abort(client)
+		return false
+		//protocol_abort(client)
 	}
 	
  
@@ -53,6 +54,7 @@ var client = function(client_sec_key_base64,
 	console.log(future_exp)
 	if(now <  valid_from_d || now > valid_to_d || future_exp <= 120){
 		console.log('Invalid Time')
+		return true
 		protocol_abort(client)
 	}	
 	var subject = crt.subject	
@@ -60,15 +62,19 @@ var client = function(client_sec_key_base64,
 	|| !(subject.CN == 'ec2-54-67-122-91.us-west-1.compute.amazonaws.com') || !(subject.emailAddress == 'cs255ta@cs.stanford.edu')){
 	//if(!(subject.C == 'US')){
 		console.log('Subject wrong')
-		protocol_abort(client)
+		return true
+		//protocol_abort(client)
 	}		 
- 	// TODO: check that server's certificate is valid
 	return true;
   }
 
   function compute_response(challenge) {
-    // TODO: compute the response to the challenge and return it.
-    return lib.bitarray_to_hex(lib.random_bitarray(256));
+	console.log('CHALLENGING')
+	// TODO: compute the response to the challenge and return it.
+	//var key = lib.ECDSA_key_gen('a45basdp03m04n6cdxza120x');
+	//var signing_key = lib.ECDSA_load_sec_key(key.sec,'a45basdp03m04n6cdxza120x');
+	return lib.bitarray_to_hex(lib.ECDSA_sign(client_sec_key ,challenge));
+	//return lib.bitarray_to_hex(lib.random_bitarray(256));
   }
 
   // Note: You will not need to modify this function
@@ -156,8 +162,8 @@ var client = function(client_sec_key_base64,
     var client_options = {
       //need to modify certificate somehow. . . by pinning it.
       ca: fs.readFileSync('data/cs255ca.pem'),
-      host: 'ec2-54-67-122-91.us-west-1.compute.amazonaws.com',
-      port: 8817,
+      host: host,
+      port: port,
       rejectUnauthorized: true
     };
 
@@ -187,17 +193,16 @@ var client = function(client_sec_key_base64,
             process_server_msg(client, msg);
           };
         })(client);
-
         socket.on('data', socket_data_handler);
         socket.on('end', function() {
           if (protocol_state !== PROTOCOL_STATE.END &&
               protocol_state !== PROTOCOL_STATE.ABORT) {
+		console.log('WRONG?')
             protocol_abort(client);
           }
         });
       };
     })(st);
-
     socket = tls.connect(port, client_options, post_connect);
     socket.on('error', function(ex) {
       client_log('TLS handshake failed when trying to connect to server');

@@ -54,7 +54,7 @@ var client = function(client_sec_key_base64,
 	console.log(future_exp)
 	if(now <  valid_from_d || now > valid_to_d || future_exp <= 120){
 		console.log('Invalid Time')
-		return true
+		return false
 		protocol_abort(client)
 	}	
 	var subject = crt.subject	
@@ -62,7 +62,7 @@ var client = function(client_sec_key_base64,
 	|| !(subject.CN == 'ec2-54-67-122-91.us-west-1.compute.amazonaws.com') || !(subject.emailAddress == 'cs255ta@cs.stanford.edu')){
 	//if(!(subject.C == 'US')){
 		console.log('Subject wrong')
-		return true
+		return false
 		//protocol_abort(client)
 	}		 
 	return true;
@@ -70,11 +70,9 @@ var client = function(client_sec_key_base64,
 
   function compute_response(challenge) {
 	console.log('CHALLENGING')
-	// TODO: compute the response to the challenge and return it.
-	//var key = lib.ECDSA_key_gen('a45basdp03m04n6cdxza120x');
-	//var signing_key = lib.ECDSA_load_sec_key(key.sec,'a45basdp03m04n6cdxza120x');
-	return lib.bitarray_to_hex(lib.ECDSA_sign(client_sec_key ,challenge));
-	//return lib.bitarray_to_hex(lib.random_bitarray(256));
+	// TODO: compute the response to the challenge and return it. 
+	//return lib.bitarray_to_hex(lib.ECDSA_sign(client_sec_key ,lib.hex_to_bitarray(challenge) ));
+	return lib.bitarray_to_hex(lib.random_bitarray(256));
   }
 
   // Note: You will not need to modify this function
@@ -161,7 +159,7 @@ var client = function(client_sec_key_base64,
     // TODO: fill in client options
     var client_options = {
       //need to modify certificate somehow. . . by pinning it.
-      ca: fs.readFileSync('data/cs255ca.pem'),
+      ca: ca_cert,
       host: host,
       port: port,
       rejectUnauthorized: true

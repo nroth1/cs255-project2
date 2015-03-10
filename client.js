@@ -56,8 +56,9 @@ var client = function(client_sec_key_base64,
 		protocol_abort(client)
 	}	
 	var subject = crt.subject	
-	if(!(subject.c == 'US') || !(subject.st =='CA') || !(subject.L == 'Stanford') || !(subject.O == 'CS 255') || !(subject.OU == 'Project 2') 
+	if(!(subject.C == 'US') || !(subject.ST =='CA') || !(subject.L == 'Stanford') || !(subject.O == 'CS 255') || !(subject.OU == 'Project 2') 
 	|| !(subject.CN == 'ec2-54-67-122-91.us-west-1.compute.amazonaws.com') || !(subject.emailAddress == 'cs255ta@cs.stanford.edu')){
+	//if(!(subject.C == 'US')){
 		console.log('Subject wrong')
 		protocol_abort(client)
 	}		 

@@ -61,12 +61,16 @@ The current scheme reads in $sec\_key\_base64$ and parses it into one 128-bit sa
 \emph{Insecure Implementation 1}. If the system stores the password in plain text with the salt and the encrypted client secret key, when the disk is leaked to the attacker or the loaded memory is exposed to the attacker, the attacker can run the entire process by himself (in particular, using the password and the salt to run KDF and then using the generated key to decrypt the client secret key). The current scheme is secure against this attack because it does not store the password anywhere.
 
 \emph{Insecure Implementation 2}. Say we attempt to speed up the loading process. The system takes the first 16 bits of the password and feed that into the KDF function with the salt. This implementation is vulnerable to brute-force attack because the attacker can just try all $2^{16} = 65536$ possible passwords and he can find the right one and thus decrypt the user secret key. Since the current scheme has variable length password and the password can be long, the brute-force attack is not feasible.
+
+With the same intention, the system might be implemented with a different hash function that is much faster than KDF. If the hash function is too fast, a password-dictionary-based brute-force attack might be able to guess out the user password and then recover the user secrete key.
 \end{question}
 
 \newpage
 
 \begin{question}{4}
 {\bf (a)} Using the symmetric encryption scheme does not need a trusted third party. In this example, we need a trusted CA to issue a certificate for the server and this might be time and money-consuming.
+
+Moreover, the MAC-based signature is generally much shorter than the public-key-secret-key digital signature. 
 \\[5pt] 
 {\bf (b)} If we're using the symmetric encryption scheme, every pair of client and server should have a different key. If that is not the case, for example, one user has the same key with Google and Facebook server, then Facebook can forge messages so that they appear to be signed by Google and the user can not distinguish because both servers share the same MAC key. Therefore, every client should store the keys for all servers and all servers should store the keys for all clients. This might be impossible if each has only a small amount of trusted storage.
 \end{question}
